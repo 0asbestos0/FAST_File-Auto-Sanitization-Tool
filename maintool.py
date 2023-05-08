@@ -40,10 +40,14 @@ else:
 
 if actualfiletype == "PDF":
 	pdfanalysis.pdfanalyze(path_to_file)
-	pdfanalysis.parsepdfobjs(path_to_file)
-	#pdfobjects = pdfanalysis.parsepdfobjs(path_to_file)
+	#pdfanalysis.parsepdfobjs(path_to_file)
+	pdfobjects = pdfanalysis.parsepdfobjs(path_to_file)
+	
+	suspdfobjects=pdfanalysis.susobjects(pdfobjects)
+	print(suspdfobjects)
 
-	#pdfanalysis.analyzepdfobjs(pdfobjects)
-
+	#add a method for extracting the embedded file
+	#add method to find any hyperlinks in pdf
+	#add method to find macros in pdf
 
 

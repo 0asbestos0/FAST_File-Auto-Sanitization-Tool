@@ -37,8 +37,13 @@ def pdfanalyze(path):
 				print("This PDF does not contain the OpenAction function")
 
 
-#class pdfobjectdatatype:
-#	def __init__:(self)
+class pdfobjectdatatype:
+	def __init__(self, objreference, content):
+		self.objreference=objreference
+		self.content=content
+
+	def __repr__(self):		#used to print the string form of objects
+		return f"Object Reference Number: {self.objreference}, Content: {self.content}"
 
 
 def parsepdfobjs(path):
@@ -48,13 +53,49 @@ def parsepdfobjs(path):
 	with open(path,'rb') as f:
 		pdfbytesdata=f.read()
 
-	pdfobjects=re.findall(pattern, pdfbytesdata, re.DOTALL)
+	pdfobjectsraw=re.findall(pattern, pdfbytesdata, re.DOTALL) # array that  stores the individial indirecto bjects in byted form
+	choice=input("Would you like to print each object to the terminal? 1/0: ")
+	
+	if choice==1:
+		for pdfobject  in pdfobjectsraw:
+			for i in pdfobject.split(b'\r\n '):
+				print(i.replace(b'\r\n',b''))
+			print('/////////////////////////////////////////////////')
+		
+	pdfobjects=[] #list that will return all the objects in the pdf
+	for pdfobject in pdfobjectsraw: #iterating to create new objects corresponding to each indirect pdf object
+		attr=getattributes(pdfobject)
+		obj=pdfobjectdatatype(attr[0],attr[1])
+		pdfobjects.append(obj)
 
-	for pdfobject  in pdfobjects:
-		for i in pdfobject.split(b'\r\n '):
-			print(i.replace(b'\r\n',b''))
-		print('/////////////////////////////////////////////////')
-		#print(type(pdfobject))
-		#break
-	
-	
+	#choice=input("Would you like to print each object to the terminal? 1/0: ")
+	#for pdfobject  in pdfobjects:
+	#		print(pdfobject)
+	#		print('/////////////////////////////////////////////////')
+	return(pdfobjects)
+
+
+
+
+
+def getattributes(pdfobject): #function to get the attributes in a cleaner way
+	attr=[]
+	filtered=pdfobject.split(b'\r\n ') #pdfobject is in bytes form
+	#print("Number: "+filtered[0].decode()[0])
+	attr.append(filtered[0].decode()[0])
+	#content=bstr[bstr.find(b'<'):bstr.rfind(b'>')].replace(b'\r\n',b'')
+	#print("Content: "+content.decode())
+	attr.append(pdfobject[pdfobject.find(b'<'):pdfobject.rfind(b'>')].replace(b'\r\n',b'')) #Maybe incorrect, check once
+	return(attr)
+
+
+def susobjects(pdfobjects):
+	keywords=[b'EmbeddedFiles',b'Filespec',b'Filter',b'EmbeddedFile']
+	suspdfobjects=[]
+	for pdfobject in pdfobjects:
+		for keyword in keywords:
+			if keyword in pdfobject.content:
+				suspdfobjects.append(pdfobject)
+				break
+
+	return(suspdfobjects)
