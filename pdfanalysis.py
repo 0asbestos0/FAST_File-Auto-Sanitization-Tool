@@ -1,5 +1,6 @@
 import os
 import subprocess
+import re
 
 def pdfanalyze(path):
 	command= 'yara64 -w ' + os.environ.get('current_directory') +'\\rulescp\\maldocs\\Maldoc_PDF.yar '+path #change rulescp to rules
@@ -11,10 +12,7 @@ def pdfanalyze(path):
 	command='pdfid '+ path
 	output = subprocess.check_output(command, shell=True)
 	output=output.decode('utf-8').replace(' ','').split("\r\n")
-	#result=os.system(command)
-	#print(type(output))
-	#print(output)
-	#print(output.split('\n'))
+	
 	for element in output:
 		if '/Encrypt' in element:
 			if element[-1] !=0:
@@ -39,3 +37,24 @@ def pdfanalyze(path):
 				print("This PDF does not contain the OpenAction function")
 
 
+#class pdfobjectdatatype:
+#	def __init__:(self)
+
+
+def parsepdfobjs(path):
+	pattern = rb'\d+\s\d+\sobj.*?endobj' #RegEx pattern for finding objects
+	print("Parsing PDF-Objects: ")
+
+	with open(path,'rb') as f:
+		pdfbytesdata=f.read()
+
+	pdfobjects=re.findall(pattern, pdfbytesdata, re.DOTALL)
+
+	for pdfobject  in pdfobjects:
+		for i in pdfobject.split(b'\r\n '):
+			print(i.replace(b'\r\n',b''))
+		print('/////////////////////////////////////////////////')
+		#print(type(pdfobject))
+		#break
+	
+	

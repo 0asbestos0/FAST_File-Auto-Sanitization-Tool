@@ -40,6 +40,10 @@ else:
 
 if actualfiletype == "PDF":
 	pdfanalysis.pdfanalyze(path_to_file)
+	pdfanalysis.parsepdfobjs(path_to_file)
+	#pdfobjects = pdfanalysis.parsepdfobjs(path_to_file)
+
+	#pdfanalysis.analyzepdfobjs(pdfobjects)
 
 
 
