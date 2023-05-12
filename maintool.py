@@ -1,6 +1,7 @@
 import welcome
 import extension
 import pdfanalysis
+import docanalysis
 
 import binascii
 import os
@@ -17,6 +18,7 @@ mb=extension.actualextension(path_to_file)
 print("mb: "+str(mb))
 magic_bytes = {
     "25504446": "PDF",
+    "d0cf11e0":"DOC",
     "ffd8ffe0": "JPEG",
     "89504e47": "PNG",
     "75737461": "TAR",
@@ -50,4 +52,6 @@ if actualfiletype == "PDF":
 	#add method to find any hyperlinks in pdf
 	#add method to find macros in pdf
 
-
+elif(actualfiletype == 'DOC'):
+	docanalysis.docanalyze(path_to_file)
+	#docselfanalysis.selfanalyze(path_to_file)
