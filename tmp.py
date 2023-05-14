@@ -241,58 +241,56 @@ with open('C:\\Users\\husky\\Downloads\\dump.doc', 'rb') as file:
 \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\''''
 import struct
 
-# Function to read sectors from the file
 def read_sectors(file, offset, sector_size):
     file.seek(offset)
     return file.read(sector_size)
 
-# Function to parse the directory entry
-def parse_directory_entry(entry_data):
-    dir_name = entry_data[:64].decode('utf-16',errors='replace').rstrip('\x00')
-    dir_type = struct.unpack('<H', entry_data[66:68])[0]
-    return dir_name, dir_type
+def read_directory_sectors(file, sector_ids, sector_size):
+    sectors = []
+    for sector_id in sector_ids:
+        sector_offset = 512 + sector_id * sector_size
+        sector_data = read_sectors(file, sector_offset, sector_size)
+        sectors.append(sector_data)
+    return sectors
 
-# Function to recursively traverse the directory tree
-def traverse_directory(file, dir_offset, sector_size):
-    print("inside traverse_directory")
-    sectors = read_sectors(file, dir_offset, sector_size)
-    entry_size = 128
+def traverse_sat(file, sat_sector_ids, sector_size):
+    sat_sectors = read_directory_sectors(file, sat_sector_ids, sector_size)
+    sector_chain = []
+    for sat_sector in sat_sectors:
+        for i in range(0, len(sat_sector), 4):
+            sector_id = struct.unpack('<i', sat_sector[i:i+4])[0]
+            sector_chain.append(sector_id)
+    return sector_chain
 
-    for i in range(0, len(sectors), entry_size):
-        entry_data = sectors[i:i + entry_size]
-        dir_name, dir_type = parse_directory_entry(entry_data)
-        print(dir_name)
-        print(dir_type)
+def traverse_directory_chain(file, directory_sector_ids, sector_size):
+    directory_sectors = read_directory_sectors(file, directory_sector_ids, sector_size)
+    directory_data = b''.join(directory_sectors)
+    return directory_data
 
-        '''if dir_type == 2:
-            # Storage (directory)
-            print(f"Directory: {dir_name}")
-            sub_dir_offset = struct.unpack('<I', entry_data[116:120])[0]
-            traverse_directory(file, sub_dir_offset * sector_size, sector_size)
-        elif dir_type == 1:
-            # Stream
-            print(f"Stream: {dir_name}")
-        elif dir_type == 0:
-            # Empty entry
-            print("Continuing")
-            continue
-		'''
-# Main function
 def extract_directory_structure(doc_file_path):
     with open(doc_file_path, 'rb') as file:
-        # Read sector size from the header at offset 30
-        file.seek(30)
-        sector_shift = struct.unpack('<H', file.read(2))[0]
-        sector_size = 2 ** sector_shift
-        print("sector_size: "+str(sector_size))
-        # Read root directory offset from the header at offset 48
-        file.seek(48)
-        root_dir_offset = struct.unpack('<I', file.read(4))[0] * sector_size
-        print('root_dir_offset: '+str(root_dir_offset))
+        header = file.read(512)
+        sector_size = 2 ** struct.unpack('<H', header[30:32])[0]
 
-        # Traverse the directory tree
-        traverse_directory(file, root_dir_offset, sector_size)
+        msat_sector_ids = struct.unpack('<109i', header[76:512])
+        sat_sector_chain = traverse_sat(file, msat_sector_ids, sector_size)
+
+        directory_sector_chain = []
+        for sat_sector_id in sat_sector_chain:
+            if sat_sector_id == -2:
+                break
+            directory_sector_chain.append(sat_sector_id)
+
+        print("directory_sector_chain: ")
+        print(directory_sector_chain)
+
+        directory_data = traverse_directory_chain(file, directory_sector_chain, sector_size)
+
+        # Process the directory data as needed
+        # Here, you can parse the directory entries or perform other operations
+        print(directory_data.decode('utf-16-le',errors='replace'))
 
 # Example usage
-doc_file_path = "C:\\Users\\husky\\Downloads\\dump.doc"
+doc_file_path = 'C:\\Users\\husky\\Downloads\\dump.doc'
 extract_directory_structure(doc_file_path)
+
