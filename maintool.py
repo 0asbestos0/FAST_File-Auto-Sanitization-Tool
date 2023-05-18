@@ -2,6 +2,7 @@ import welcome
 import extension
 import pdfanalysis
 import docanalysis
+import doc_self_mine
 
 import binascii
 import os
@@ -46,8 +47,16 @@ if actualfiletype == "PDF":
 	pdfobjects = pdfanalysis.parsepdfobjs(path_to_file)
 	
 	suspdfobjects=pdfanalysis.susobjects(pdfobjects)
+	print('The following PDF objects number are suspicious. Check each object individually and extract if needed')
 	print(suspdfobjects)
+	while True:
+		choice=input('Enter which object number to extract (0 to exit): ')
+		if choice=='0':
+			break
+		pdfanalysis.extract(path_to_file,int(choice))
 
+	print('Disabling Active components if any and outputting cleaned file: ')
+	pdfanalysis.disable(path_to_file)
 	#add a method for extracting the embedded file
 	#add method to find any hyperlinks in pdf
 	#add method to find macros in pdf
@@ -55,3 +64,4 @@ if actualfiletype == "PDF":
 elif(actualfiletype == 'DOC'):
 	docanalysis.docanalyze(path_to_file)
 	#docselfanalysis.selfanalyze(path_to_file)
+	doc_self_mine.func2(path_to_file)

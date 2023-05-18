@@ -43,7 +43,8 @@ class pdfobjectdatatype:
 		self.content=content
 
 	def __repr__(self):		#used to print the string form of objects
-		return f"Object Reference Number: {self.objreference}, Content: {self.content}"
+		#return f"Object Reference Number: {self.objreference}, Content: {self.content}"
+		return f"Object Reference Number: {self.objreference}"
 
 
 def parsepdfobjs(path):
@@ -56,11 +57,9 @@ def parsepdfobjs(path):
 	pdfobjectsraw=re.findall(pattern, pdfbytesdata, re.DOTALL) # array that  stores the individial indirecto bjects in byted form
 	choice=input("Would you like to print each object to the terminal? 1/0: ")
 	
-	if choice==1:
-		for pdfobject  in pdfobjectsraw:
-			for i in pdfobject.split(b'\r\n '):
-				print(i.replace(b'\r\n',b''))
-			print('/////////////////////////////////////////////////')
+	if choice=='1':
+		for pdfobject in pdfobjectsraw:
+			print(pdfobject.replace(b'\r\n',b''))
 		
 	pdfobjects=[] #list that will return all the objects in the pdf
 	for pdfobject in pdfobjectsraw: #iterating to create new objects corresponding to each indirect pdf object
@@ -95,7 +94,18 @@ def susobjects(pdfobjects):
 	for pdfobject in pdfobjects:
 		for keyword in keywords:
 			if keyword in pdfobject.content:
-				suspdfobjects.append(pdfobject)
+				suspdfobjects.append(pdfobject.objreference)
 				break
 
 	return(suspdfobjects)
+
+def extract(path,objreference):
+	command='pdf-parser -f -o '+str(objreference)+' -d \"'+ path[:-4] +'(extracted obj '+str(objreference)+').bin\" '+path
+	print('Command: '+command)
+	output = subprocess.check_output(command, shell=True)
+	print(output)
+
+def disable(path):
+	command='pdfid -d \"'+path+'\"'
+	print('Command: '+command)
+	output = subprocess.check_output(command, shell=True)

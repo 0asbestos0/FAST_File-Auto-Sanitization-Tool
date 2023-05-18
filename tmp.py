@@ -239,7 +239,7 @@ with open('C:\\Users\\husky\\Downloads\\dump.doc', 'rb') as file:
     # Display the extracted directory structure
     print(directory_data)
 \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\''''
-import struct
+'''import struct
 
 def read_sectors(file, offset, sector_size):
     file.seek(offset)
@@ -293,4 +293,142 @@ def extract_directory_structure(doc_file_path):
 # Example usage
 doc_file_path = 'C:\\Users\\husky\\Downloads\\dump.doc'
 extract_directory_structure(doc_file_path)
+'''
 
+'''dirs=[b'\x01\x02\x03',b'\x01\x02\x03',b'\x01\x02\x03',b'\x01\x02\x03']
+dirs2=[]
+for d in dirs:
+	dirs2.append(d[0:1]+b'\x04'+d[2:3])
+	#print(d[2:3])
+print(dirs2)'''
+
+import struct
+def func(filename):
+	
+	with open(filename,'rb') as f:
+		data=f.read()
+
+	datacp=data 																	#Used to output disarmed file
+	header=data[:512]
+
+	uSectorShift=2**(int.from_bytes(data[30:32],byteorder='little'))
+	uMiniSectorShift=2**(int.from_bytes(header[32:34],byteorder='little'))
+	csectFAT=int.from_bytes(header[44:48],byteorder='little')
+	sectDirStart=int.from_bytes(header[48:52],byteorder='little')
+	ulMiniSectorCutoff=int.from_bytes(data[56:60],byteorder='little')
+	sectMiniFatStart=struct.unpack('<i',header[60:64])[0]
+	csectMiniFat=struct.unpack('<i',header[64:68])[0]
+	sectFat=[]																		#First 109 FAT sector numbers
+	for i in range(76,len(header),4):
+		secID=struct.unpack('<i',header[i:i+4])[0]
+		if secID!=-1:
+			sectFat.append(secID)
+	
+	#FatSectors=[]																	#Valid Fat Sectors
+	#for i in sectFat:
+	#	if i!=-1:
+	#		FatSectors.append(i)
+	print('FAT Sectors:')
+	print(sectFat)
+
+	FatChain=[]
+	for sectornumber in sectFat:
+		sectordata=data[512*(sectornumber+1):512*(sectornumber+2)]
+		for j in range(0,len(sectordata),4):
+			FatChain.append(struct.unpack('<i',sectordata[j:j+4])[0])
+	print('FatChain: ')
+	print(FatChain)
+
+	DirChain=traverseFat(FatChain,sectDirStart)
+	#print('Directory chain: ')
+	#print(DirChain)
+
+	print('MiniFat chain:')
+	print(traverseFat(FatChain,sectMiniFatStart))
+
+	directory=parsedirectory(DirChain,data)
+	print('Directory: ')
+	print(directory)
+
+	#suspeciousnames=['Macros','VBA']
+	print('Disarming file if it contains Macros or VBA.')
+	for d in directory:
+		#print(d.UL)
+		if d.Name == 'Macros':
+			data=disarm(data, 'Macros')
+		elif d.Name == 'VBA':
+			data=disarm(data, 'VBA')
+
+	if (data!=datacp):
+		print('Outputting the disarmed file:')
+		outputfilename=filename[:-4] + '(clean).doc'
+		with open(outputfilename,'wb') as f:
+			f.write(data)
+
+
+
+def disarm(data,keyword):
+	if keyword=='Macros':
+		print('Making Macros entry invalid')
+		index=data.index(b'\x4D\x00\x61\x00\x63\x00\x72\x00\x6F\x00\x73')			#Searches for the string 'Macro'
+		data= data[:index+66]+b'\x00'+data[68:]									#Replaces directory type to 0 which means invalid
+		return data
+	elif keyword=='VBA':
+		print('Making VBA entry invalid')
+		index=data.index(b'\x56\x00\x42\x00\x41')									#Searches for string 'VBA'
+		data= data[:index+66]+b'\x00'+data[68:]									#Replaces directory type to 0 which means invalid
+		return data
+
+class Directory:
+	def __init__(self, Name, Type, SidLeftSib, SidRightSib, SidChild, SectStart, Ulsize):
+		self.Name=Name
+		self.Type=Type
+		self.SidLeftSib=SidLeftSib
+		self.SidRightSib=SidRightSib
+		self.SidChild=SidChild
+		self.SectStart=SectStart
+		self.Ulsize=Ulsize
+	def __repr__(self):
+		return f"Name: {self.Name}, Type: {self.Type}"
+
+def parsedirectory(DirChain,data):
+	dirobjects=[]
+
+	for DirSectNumber in DirChain:
+		DirSectData=data[512*(DirSectNumber+1):512*(DirSectNumber+2)]
+		for i in range(0,len(DirSectData),128):
+			cb=DirSectData[i+64]
+			cb=int.from_bytes(DirSectData[i+64:i+66],byteorder='little')
+			Name=DirSectData[i:i+cb-2].decode('utf-16-le',errors='ignore').strip() #cb-2 to account for trainling nulll bytes
+			Type=DirSectData[i+66]
+			SidLeftSib=struct.unpack('<i',DirSectData[i+68:i+72])[0]
+			SidRightSib=struct.unpack('<i',DirSectData[i+72:i+76])[0]
+			SidChild=struct.unpack('<i',DirSectData[i+76:i+80])[0]
+			SectStart=struct.unpack('<i',DirSectData[i+116:i+120])[0]
+			Ulsize=struct.unpack('<i',DirSectData[i+120:i+124])[0]
+
+			dirobjects.append(Directory(Name,Type,SidLeftSib,SidRightSib,SidChild,SectStart,Ulsize))
+	return(dirobjects)
+
+def traverseFat(FatChain,startSecID):
+	chain=[]
+	while startSecID!=-2:
+		chain.append(startSecID)
+		startSecID=FatChain[startSecID]
+
+
+	return(chain)
+
+def func2(filename):
+	with open(filename,'rb') as f:
+		data = f.read()
+	#print('Index is: ')
+	#index=data.index(b'\x4D\x00\x61\x00\x63\x00\x72\x00\x6F\x00\x73')
+	#print(index)
+	#data=data[:index+66]+b'\x00\x00'+data[68:]
+	#print(data[index:index+128].decode('utf-16-le',errors='ignore'))
+	print(filename[:-4])
+
+filename=input('Enter filename: ')
+func(filename)
+#func2(filename)
