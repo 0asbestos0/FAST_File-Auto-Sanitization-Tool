@@ -429,6 +429,6 @@ def func2(filename):
 	#print(data[index:index+128].decode('utf-16-le',errors='ignore'))
 	print(filename[:-4])
 
-filename=input('Enter filename: ')
-func(filename)
+#filename=input('Enter filename: ')
+#func(filename)
 #func2(filename)

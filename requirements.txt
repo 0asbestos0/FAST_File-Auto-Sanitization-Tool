@@ -1,0 +1,4 @@
+ortools
+oletools
+python-docx
+pdfid

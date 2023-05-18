@@ -3,6 +3,7 @@ import extension
 import pdfanalysis
 import docanalysis
 import doc_self_mine
+import tmp
 
 import binascii
 import os
@@ -64,4 +65,5 @@ if actualfiletype == "PDF":
 elif(actualfiletype == 'DOC'):
 	docanalysis.docanalyze(path_to_file)
 	#docselfanalysis.selfanalyze(path_to_file)
-	doc_self_mine.func2(path_to_file)
+	#doc_self_mine.func2(path_to_file)
+	tmp.func(path_to_file)
