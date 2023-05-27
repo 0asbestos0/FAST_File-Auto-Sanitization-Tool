@@ -303,6 +303,9 @@ for d in dirs:
 print(dirs2)'''
 
 import struct
+from docx import Document
+import win32com.client as win32
+
 def func(filename):
 	
 	with open(filename,'rb') as f:
@@ -342,42 +345,82 @@ def func(filename):
 	DirChain=traverseFat(FatChain,sectDirStart)
 	#print('Directory chain: ')
 	#print(DirChain)
-
-	print('MiniFat chain:')
-	print(traverseFat(FatChain,sectMiniFatStart))
+	miniFatSectors=traverseFat(FatChain,sectMiniFatStart)
+	print('MiniFat Sectors:')
+	print(miniFatSectors)
 
 	directory=parsedirectory(DirChain,data)
 	print('Directory: ')
-	print(directory)
-
-	#suspeciousnames=['Macros','VBA']
-	print('Disarming file if it contains Macros or VBA.')
 	for d in directory:
-		#print(d.UL)
-		if d.Name == 'Macros':
-			data=disarm(data, 'Macros')
-		elif d.Name == 'VBA':
-			data=disarm(data, 'VBA')
+		print(d)
 
-	if (data!=datacp):
-		print('Outputting the disarmed file:')
-		outputfilename=filename[:-4] + '(clean).doc'
-		with open(outputfilename,'wb') as f:
-			f.write(data)
+	secMiniStreamStart=directory[0].SectStart
+	print('Starting sector of MiniStream:')
+	print(secMiniStreamStart)
+
+	MiniStreamChain=traverseFat(FatChain,secMiniStreamStart)
+	print('MiniStream Sector chain: ')
+	print(MiniStreamChain)
+	
+	miniFatchain=traverseMiniFat(miniFatSectors,data)
+	print('Mini Fat Chain: ')
+	print(miniFatchain)
+	#suspeciousnames=['Macros','VBA']
+	#print('Disarming file if it contains Macros or VBA.')
+#	for d in directory:
+#		#print(d.UL)
+#		if d.Name == 'Macros':
+#			#data=disarm(data, 'Macros')
+#			disarm(filename)
+#		elif d.Name == 'VBA':
+#			continue
+			#data=disarm(data, 'VBA')
+
+	#if (data!=datacp):
+#		print('Outputting the disarmed file:')
+#		outputfilename=filename[:-4] + '(clean).doc'
+#		with open(outputfilename,'wb') as f:
+#			f.write(data)
+
+def traverseMiniFat(miniFatSectors,data):
+	miniFatdata=b''
+	for sector in miniFatSectors:
+		miniFatdata=miniFatdata + data[512*(sector+1):512*(sector+2)]
+
+	miniFatchain=[]
+	for i in range(0,len(miniFatdata),4):
+		miniFatchain.append(struct.unpack('<i',miniFatdata[i:i+4])[0])
+	return miniFatchain
+
+def disarm(filename):
+	word_app = win32.gencache.EnsureDispatch('Word.Application')
+	doc = word_app.Documents.Open('filename')
+	macros_directory = None
+	for directory in doc.BuiltInDocumentProperties:
+		if directory.Name == 'Macros':
+			macros_directory = directory
+			break
 
 
+	if macros_directory:
+		macros_directory.Value = 'Invalid'
+	
 
-def disarm(data,keyword):
-	if keyword=='Macros':
-		print('Making Macros entry invalid')
-		index=data.index(b'\x4D\x00\x61\x00\x63\x00\x72\x00\x6F\x00\x73')			#Searches for the string 'Macro'
-		data= data[:index+66]+b'\x00'+data[68:]									#Replaces directory type to 0 which means invalid
-		return data
-	elif keyword=='VBA':
-		print('Making VBA entry invalid')
-		index=data.index(b'\x56\x00\x42\x00\x41')									#Searches for string 'VBA'
-		data= data[:index+66]+b'\x00'+data[68:]									#Replaces directory type to 0 which means invalid
-		return data
+	new_file_name = filename[:-4]+'(disabled_macros).doc'
+	doc.SaveAs(new_file_name)
+	doc.Close()
+	word_app.Quit()
+#def disarm(data,keyword):
+#	if keyword=='Macros':
+#		print('Making Macros entry invalid')
+#		index=data.index(b'\x4D\x00\x61\x00\x63\x00\x72\x00\x6F\x00\x73')			#Searches for the string 'Macro'
+#		data= data[:index+66]+b'\x00'+data[68:]									#Replaces directory type to 0 which means invalid
+#		return data
+#	elif keyword=='VBA':
+#		print('Making VBA entry invalid')
+#		index=data.index(b'\x56\x00\x42\x00\x41')									#Searches for string 'VBA'
+#		data= data[:index+66]+b'\x00'+data[68:]									#Replaces directory type to 0 which means invalid
+#		return data
 
 class Directory:
 	def __init__(self, Name, Type, SidLeftSib, SidRightSib, SidChild, SectStart, Ulsize):
@@ -389,7 +432,7 @@ class Directory:
 		self.SectStart=SectStart
 		self.Ulsize=Ulsize
 	def __repr__(self):
-		return f"Name: {self.Name}, Type: {self.Type}"
+		return f"Name: {self.Name}, Type: {self.Type}, Size: {self.Ulsize}, SectStart: {self.SectStart}"
 
 def parsedirectory(DirChain,data):
 	dirobjects=[]

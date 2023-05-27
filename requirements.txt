@@ -1,4 +1,6 @@
+bitstring
 ortools
 oletools
 python-docx
 pdfid
+pywin32
