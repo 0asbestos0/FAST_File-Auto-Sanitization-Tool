@@ -168,7 +168,32 @@ def DecompressChunk(compressedChunk):
                 decompressedChunk += copy
     return decompressedChunk, compressedChunk[size:]
 
-with open('C:\\Users\\husky\\Downloads\\dumped\\Macros\\VBA\\Module1.vba','rb') as f:
-    Compresseddata=f.read()
-DecompressedChunk=DecompressChunk(Compresseddata[3138:])
-print(DecompressedChunk[0])
+
+def find_pattern_offsets(data, pattern):
+    offsets = []
+    pattern_length = len(pattern)
+    data_length = len(data)
+
+    for i in range(data_length - pattern_length + 1):
+        if data[i:i+pattern_length] == pattern:
+            offsets.append(i)
+
+    return offsets
+
+
+def find_and_decompress(filename,data):
+    pattern=b'\x00Attribut\x00e '
+    offsets= find_pattern_offsets(data, pattern)
+    print('offsets:')
+    print(offsets)
+    if -1 not in offsets:
+        c=input("Macros found, should i print the decompressed Macros? 1/0")
+        if c=='1':
+            for offset in offsets:
+                DecompressedChunk=DecompressChunk(data[offset-2:])
+                print(DecompressedChunk[0])
+                print('/////////////////////////////////////////////////////')
+                print('/////////////////////////////////////////////////////')
+
+        return(0)
+    return(1)

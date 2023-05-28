@@ -305,6 +305,8 @@ print(dirs2)'''
 import struct
 from docx import Document
 import win32com.client as win32
+import ExtractVba
+import os
 
 def func(filename):
 	
@@ -393,23 +395,17 @@ def traverseMiniFat(miniFatSectors,data):
 	return miniFatchain
 
 def disarm(filename):
-	word_app = win32.gencache.EnsureDispatch('Word.Application')
-	doc = word_app.Documents.Open('filename')
-	macros_directory = None
-	for directory in doc.BuiltInDocumentProperties:
-		if directory.Name == 'Macros':
-			macros_directory = directory
-			break
+	with open(filename,'rb') as f:
+		data=f.read()
+	vbaFlag=ExtractVba.find_and_decompress(filename,data)
+	print(vbaFlag)
+	if vbaFlag==0: #Means Macros are found
+		print('Found Macros, disarming the file')
+		command=os.environ.get('current_directory')+'VBASanitizer.exe '+filename+' '+filename[:-4]+'(RemovedMacros)'+filename[-4:]
+		print(command)
 
 
-	if macros_directory:
-		macros_directory.Value = 'Invalid'
-	
 
-	new_file_name = filename[:-4]+'(disabled_macros).doc'
-	doc.SaveAs(new_file_name)
-	doc.Close()
-	word_app.Quit()
 #def disarm(data,keyword):
 #	if keyword=='Macros':
 #		print('Making Macros entry invalid')

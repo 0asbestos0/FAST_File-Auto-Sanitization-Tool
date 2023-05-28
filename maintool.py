@@ -5,6 +5,7 @@ import docanalysis
 import doc_self_mine
 import tmp
 
+
 import binascii
 import os
 
@@ -67,3 +68,5 @@ elif(actualfiletype == 'DOC'):
 	#docselfanalysis.selfanalyze(path_to_file)
 	#doc_self_mine.func2(path_to_file)
 	tmp.func(path_to_file)
+	print("Checking if file contains Macros, extracting if found and disarming the file:")
+	tmp.disarm(path_to_file)
