@@ -401,8 +401,9 @@ def disarm(filename):
 	print(vbaFlag)
 	if vbaFlag==0: #Means Macros are found
 		print('Found Macros, disarming the file')
-		command=os.environ.get('current_directory')+'VBASanitizer.exe '+filename+' '+filename[:-4]+'(RemovedMacros)'+filename[-4:]
+		command=os.environ.get('current_directory')+'\\VBASanitizer.exe '+filename+' '+filename[:-4]+'(RemovedMacros)'+filename[-4:]
 		print(command)
+		os.system(command)
 
 
 
