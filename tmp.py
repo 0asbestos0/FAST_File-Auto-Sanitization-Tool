@@ -307,6 +307,24 @@ from docx import Document
 import win32com.client as win32
 import ExtractVba
 import os
+import subprocess
+
+def docyara(path,args):
+	#command= 'yara64 -w ' + os.environ.get('current_directory') +'\\rulescp\\maldocs\\Maldoc_PDF.yar '+path #change rulescp to rules
+	#print(command)
+	print("Running yara rules: \n")
+	command = 'ls '+ os.environ.get('current_directory') +'\\rulescp\\maldocs'
+	rules = subprocess.check_output(command, shell=True).decode().split('\r\n')
+	
+	while ('' in rules): # just some filtering
+		rules.remove('')
+
+	
+	for rule in rules:
+		command='yara64 -w ' + os.environ.get('current_directory') +'\\rulescp\\maldocs\\'+rule+' '+path #change rulescp to rules
+		if args.manual:
+			if (os.system(command)!=0):
+				print(os.system(command))
 
 def func(filename):
 	
@@ -406,19 +424,6 @@ def disarm(filename):
 		os.system(command)
 
 
-
-#def disarm(data,keyword):
-#	if keyword=='Macros':
-#		print('Making Macros entry invalid')
-#		index=data.index(b'\x4D\x00\x61\x00\x63\x00\x72\x00\x6F\x00\x73')			#Searches for the string 'Macro'
-#		data= data[:index+66]+b'\x00'+data[68:]									#Replaces directory type to 0 which means invalid
-#		return data
-#	elif keyword=='VBA':
-#		print('Making VBA entry invalid')
-#		index=data.index(b'\x56\x00\x42\x00\x41')									#Searches for string 'VBA'
-#		data= data[:index+66]+b'\x00'+data[68:]									#Replaces directory type to 0 which means invalid
-#		return data
-
 class Directory:
 	def __init__(self, Name, Type, SidLeftSib, SidRightSib, SidChild, SectStart, Ulsize):
 		self.Name=Name
@@ -459,15 +464,6 @@ def traverseFat(FatChain,startSecID):
 
 	return(chain)
 
-def func2(filename):
-	with open(filename,'rb') as f:
-		data = f.read()
-	#print('Index is: ')
-	#index=data.index(b'\x4D\x00\x61\x00\x63\x00\x72\x00\x6F\x00\x73')
-	#print(index)
-	#data=data[:index+66]+b'\x00\x00'+data[68:]
-	#print(data[index:index+128].decode('utf-16-le',errors='ignore'))
-	print(filename[:-4])
 
 #filename=input('Enter filename: ')
 #func(filename)
