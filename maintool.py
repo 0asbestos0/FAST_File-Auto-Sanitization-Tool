@@ -3,6 +3,7 @@ import extension
 import pdfanalysis
 import docanalysis
 import doc_self_mine
+import VT
 import tmp
 import argparse
 
@@ -45,22 +46,29 @@ def main(filename,args):
 	else:
 		print("Cannot process this filetype yet")
 	
+	if args.vt:
+		VT.scan(path_to_file,args)
 
 	if actualfiletype == "PDF":
-		pdfanalysis.pdfanalyze(path_to_file)
+		pdfanalysis.pdfanalyze(path_to_file)						#Only runs YARA rules
 		#pdfanalysis.parsepdfobjs(path_to_file)
-		pdfobjects = pdfanalysis.parsepdfobjs(path_to_file)
+		pdfobjects = pdfanalysis.parsepdfobjs(path_to_file,args)
 		
 		suspdfobjects=pdfanalysis.susobjects(pdfobjects)
-		print('The following PDF objects number are suspicious. Check each object individually and extract if needed')
-		print(suspdfobjects)
-		while True:
-			choice=input('Enter which object number to extract (0 to exit): ')
-			if choice=='0':
-				break
-			pdfanalysis.extract(path_to_file,int(choice))
+		if args.manual:
+			print('The following PDF objects number are suspicious. Check each object individually and extract if needed')
+			print(suspdfobjects)
+			while True:
+				choice=input('Enter which object number to extract (0 to exit): ')
+				if choice=='0':
+					break
+				pdfanalysis.extract(path_to_file,int(choice))
+		else:
+			for suspdfobject in suspdfobjects:
+				pdfanalysis.extract(path_to_file,int(suspdfobject))
+
 	
-		print('Disabling Active components if any and outputting cleaned file: ')
+		print('Disabling JS and Auto Launch if any and outputting cleaned file: ')
 		pdfanalysis.disable(path_to_file)
 		#add a method for extracting the embedded file
 		#add method to find any hyperlinks in pdf
@@ -68,49 +76,48 @@ def main(filename,args):
 	
 	elif(actualfiletype == 'DOC'):
 		tmp.docyara(path_to_file,args)			#Only runs YARA rules
-		tmp.func(path_to_file)
+		tmp.func(path_to_file,args)				#For manual (Self) parsing
 		print("Checking if file contains Macros, extracting if found and disarming the file:")
-		tmp.disarm(path_to_file)
-	
+		tmp.disarm(path_to_file,args)			#Prints Decompressed Macros and disarms the file
 
 
 
 
 
-
-
-def printhelp(): #Not working yet
-	helpstr='''THIS IS THE HELP PAGE IN MAKING
-		FLAGS:
-		-d 			--directory 		Path to directory where all files to be analyzed is kept
-		-f 			--filename 			Absolute path of one specific file
-		--help 							Print this help
-		--manual						MANUAL mode (For Experts)
-		
-
-		'''
+def printguide():
+	helpstr='''THIS IS THE HELP PAGE IN MAKING\nThis tool analyzes Various file tyeps of maliciousness.\nSupported filetypes:\n\n\t.doc \t.xls \t.ppt\n \t.docx	.docm 	.xlsx 	.pptx\n\t.pdf\n\nFLAGS:\n\t-d\t\t--directory\t\tPath to directory where all files to be analyzed is kept (Not compatible with manual mode)\n\t-f\t\t--filename\t\t"Absolute" path of one specific file\n\t--help\t\t\t\t\tPrint the default help\n\t--manual\t\t\t\tMANUAL mode (For Experts)\n\t--guide\t\t\t\t\tPrint this guide'''
 	print(helpstr)
-	return 0
+
 
 if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser(description="Checks and sanitizes various file types automatically")
-	parser.add_argument("-d", "--directory", type=str, help="Path to a directory which contains all files to analyze")
+	parser.add_argument("-d", "--directory", type=str, help="Path to a directory which contains all files to analyze. Not compatible with manual mode")
 	parser.add_argument("-f", "--filename", type=str, help="File name of a specific file to be analyzed")
-	parser.add_argument("--manual", action="store_true", help="Manual mode (Promts user, Use only if you have knowledge about file formats)")
+	parser.add_argument("-m", "--manual", action="store_true", help="Manual mode (Promts user, Use only if you have knowledge about file formats)")
+	parser.add_argument("-vt", "-virustotal", action="store_true", help="If there is internet, it also uses VirusTotal. *T&C Apply. Not compatible with directory flag")
+	parser.add_argument("--guide", action="store_true", help="Explains how to use the tool")
 	args = parser.parse_args()
+
+	if args.guide:
+		printguide()
+		sys.exit()
 	
 	#Introduce some checks because not all flags are compatible with other
+	print(args)
 	if (args.directory!=None and args.filename!=None):
 		print('Inavlid set of arguments, Only one of Directory or filename must be specified')
 		sys.exit()
-	if (args.directory=None and args.filename=None):
+	if (args.directory!=None and args.vt==True):
+		print('Inavlid set of arguments, Directory flag is not compatible with VirusTotal as of now')
+		sys.exit()
+	if (args.directory==None and args.filename==None):
 		print('Inavlid set of arguments, Provide either a directory or a filename')
 		sys.exit()
-	
-	print(args.directory)
-	print(args.filename)
-	print(args.manual)
+	if (args.directory!=None and args.manual==True):
+		print('Inavlid set of arguments, Manual mode cannot be run if directory is specified')
+		sys.exit()
+
 
 	if args.filename!=None:
 		main(args.filename,args)

@@ -47,7 +47,7 @@ class pdfobjectdatatype:
 		return f"Object Reference Number: {self.objreference}"
 
 
-def parsepdfobjs(path):
+def parsepdfobjs(path,args):
 	pattern = rb'\d+\s\d+\sobj.*?endobj' #RegEx pattern for finding objects
 	print("Parsing PDF-Objects: ")
 
@@ -55,11 +55,12 @@ def parsepdfobjs(path):
 		pdfbytesdata=f.read()
 
 	pdfobjectsraw=re.findall(pattern, pdfbytesdata, re.DOTALL) # array that  stores the individial indirecto bjects in byted form
-	choice=input("Would you like to print each object to the terminal? 1/0: ")
+	if args.manual:
+		choice=input("Would you like to print each object to the terminal? 1/0: ")
 	
-	if choice=='1':
-		for pdfobject in pdfobjectsraw:
-			print(pdfobject.replace(b'\r\n',b''))
+		if choice=='1':
+			for pdfobject in pdfobjectsraw:
+				print(pdfobject.replace(b'\r\n',b''))
 		
 	pdfobjects=[] #list that will return all the objects in the pdf
 	for pdfobject in pdfobjectsraw: #iterating to create new objects corresponding to each indirect pdf object

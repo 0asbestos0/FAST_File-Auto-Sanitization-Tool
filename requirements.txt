@@ -1,4 +1,6 @@
 comtypes
+hashlib
+vt-py
 bitstring
 ortools
 oletools

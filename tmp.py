@@ -326,7 +326,9 @@ def docyara(path,args):
 			if (os.system(command)!=0):
 				print(os.system(command))
 
-def func(filename):
+def func(filename,args):
+	if args.manual==False:
+		return 0
 	
 	with open(filename,'rb') as f:
 		data=f.read()
@@ -412,16 +414,23 @@ def traverseMiniFat(miniFatSectors,data):
 		miniFatchain.append(struct.unpack('<i',miniFatdata[i:i+4])[0])
 	return miniFatchain
 
-def disarm(filename):
+def disarm(filename,args):
 	with open(filename,'rb') as f:
 		data=f.read()
-	vbaFlag=ExtractVba.find_and_decompress(filename,data)
-	print(vbaFlag)
+	vbaFlag=ExtractVba.find_and_decompress(filename,data,args)
+	#print(vbaFlag)
 	if vbaFlag==0: #Means Macros are found
-		print('Found Macros, disarming the file')
-		command=os.environ.get('current_directory')+'\\VBASanitizer.exe '+filename+' '+filename[:-4]+'(RemovedMacros)'+filename[-4:]
-		print(command)
-		os.system(command)
+		if not args.manual:
+			print('Macros Found, disarming the file')
+			command=os.environ.get('current_directory')+'\\VBASanitizer.exe '+filename+' '+filename[:-4]+'(RemovedMacros)'+filename[-4:]
+			#print(command)
+			os.system(command)
+			return 0
+		c=input('Found Macros disarm the file? 1/0: ')
+		if args.manual and c=='1':
+			command=os.environ.get('current_directory')+'\\VBASanitizer.exe '+filename+' '+filename[:-4]+'(RemovedMacros)'+filename[-4:]
+			#print(command)
+			os.system(command)
 
 
 class Directory:
