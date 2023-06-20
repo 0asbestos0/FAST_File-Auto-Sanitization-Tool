@@ -9,14 +9,15 @@ import argparse
 
 import binascii
 import os
+import subprocess
 import sys
 
 def main(filename,args):
 	
-	os.environ['current_directory']=os.getcwd()
+	os.environ['current_directory']=os.path.dirname(os.path.abspath( __file__ ))
 	
-	welcome.welcome()
-	path_to_file=args.filename
+	
+	path_to_file=filename
 	
 	print("Path: "+path_to_file)
 	mb=extension.actualextension(path_to_file)
@@ -40,11 +41,10 @@ def main(filename,args):
 		actualfiletype=magic_bytes[mb]
 		print("actual filetype: "+actualfiletype)
 	
-	elif str(mb)[0:4] == '4d5a':
-		print("actual filetype: EXE")
-	
 	else:
 		print("Cannot process this filetype yet")
+		exit()
+
 	
 	if args.vt:
 		VT.scan(path_to_file,args)
@@ -65,7 +65,8 @@ def main(filename,args):
 				pdfanalysis.extract(path_to_file,int(choice))
 		else:
 			for suspdfobject in suspdfobjects:
-				pdfanalysis.extract(path_to_file,int(suspdfobject))
+				#pdfanalysis.extract(path_to_file,int(suspdfobject))
+				pdfanalysis.extract2(path_to_file, pdfobjects, int(suspdfobject), args)
 
 	
 		print('Disabling JS and Auto Launch if any and outputting cleaned file: ')
@@ -87,6 +88,18 @@ def main(filename,args):
 def printguide():
 	helpstr='''THIS IS THE HELP PAGE IN MAKING\nThis tool analyzes Various file tyeps of maliciousness.\nSupported filetypes:\n\n\t.doc \t.xls \t.ppt\n \t.docx	.docm 	.xlsx 	.pptx\n\t.pdf\n\nFLAGS:\n\t-d\t\t--directory\t\tPath to directory where all files to be analyzed is kept (Not compatible with manual mode)\n\t-f\t\t--filename\t\t"Absolute" path of one specific file\n\t--help\t\t\t\t\tPrint the default help\n\t--manual\t\t\t\tMANUAL mode (For Experts)\n\t--guide\t\t\t\t\tPrint this guide'''
 	print(helpstr)
+
+def dirmode(args):
+	#fnames=[]
+	fnames = subprocess.check_output('ls '+str(args.directory), shell=True).decode().strip('\r\n').split('\r\n')
+	for i in range(len(fnames)):
+		fnames[i]=args.directory+'\\'+fnames[i]
+
+	print(fnames)
+	
+
+	for fname in fnames:
+		main(fname,args)
 
 
 if __name__ == '__main__':
@@ -118,11 +131,14 @@ if __name__ == '__main__':
 		print('Inavlid set of arguments, Manual mode cannot be run if directory is specified')
 		sys.exit()
 
+	welcome.welcome()
 
 	if args.filename!=None:
 		main(args.filename,args)
 		sys.exit()
 	
 	elif args.directory!=None:
-		print('doing something')
+		#print('doing something')
+		args.directory=args.directory.strip('\\').strip('/')
+		dirmode(args)
 

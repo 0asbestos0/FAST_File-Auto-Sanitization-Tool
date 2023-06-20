@@ -418,17 +418,17 @@ def disarm(filename,args):
 	with open(filename,'rb') as f:
 		data=f.read()
 	vbaFlag=ExtractVba.find_and_decompress(filename,data,args)
-	#print(vbaFlag)
+	#print(vbaFlag)`														
 	if vbaFlag==0: #Means Macros are found
 		if not args.manual:
 			print('Macros Found, disarming the file')
-			command=os.environ.get('current_directory')+'\\VBASanitizer.exe '+filename+' '+filename[:-4]+'(RemovedMacros)'+filename[-4:]
+			command=os.environ.get('current_directory')+'\\VBASanitizer.exe '+'\"' +filename+ '\"'+' '+filename[:-4]+'(RemovedMacros)'+filename[-4:]
 			#print(command)
 			os.system(command)
 			return 0
 		c=input('Found Macros disarm the file? 1/0: ')
 		if args.manual and c=='1':
-			command=os.environ.get('current_directory')+'\\VBASanitizer.exe '+filename+' '+filename[:-4]+'(RemovedMacros)'+filename[-4:]
+			command=os.environ.get('current_directory')+'\\VBASanitizer.exe '+'\"' +filename+ '\"'+' '+filename[:-4]+'(RemovedMacros)'+filename[-4:]
 			#print(command)
 			os.system(command)
 

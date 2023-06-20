@@ -3,7 +3,7 @@ import subprocess
 import re
 
 def pdfanalyze(path):
-	command= 'yara64 -w ' + os.environ.get('current_directory') +'\\rulescp\\maldocs\\Maldoc_PDF.yar '+path #change rulescp to rules
+	command= 'yara64 -w ' + os.environ.get('current_directory') +'\\rulescp\\maldocs\\Maldoc_PDF.yar '+ '\"' + path + '\"' #change rulescp to rules
 	#print(command)
 	print("Running yara rules: \n")
 	print(os.system(command))
@@ -105,6 +105,24 @@ def extract(path,objreference):
 	print('Command: '+command)
 	output = subprocess.check_output(command, shell=True)
 	print(output)
+
+
+def extract2(path, pdfobjects, objreference, args):
+	if args.manual:						#If manual mode is enabled, extract the object in a binary file
+		dfilename=path[:-4]+'(ExtractedObj_'+str(objreference)+').bin'
+
+		obj=pdfobjects[objreference-1].split(b'\x0D\x0A')
+
+		if b'/Filter' in obj:
+			
+			tmp=obj[obj.index(b'/Filter')+8:]			# 7 to accomodate 7 characters of /Filter and one space
+
+			objfilter=tmp[:index(b'\x0D\x0A')]
+			print(objfilter)
+
+		#swith open(dfilename,'wb') as f:
+
+
 
 def disable(path):
 	command='pdfid -d \"'+path+'\"'
