@@ -1,0 +1,5 @@
+2023-06-21 16:05:04,534 [+] INFO - File to be scanned: C:\Users\husky\Downloads\monochromepdf.pdf
+2023-06-21 16:05:04,552 [+] INFO - Magic Bytes of file: 25504446
+2023-06-21 16:05:04,552 [+] INFO - Running Yara Rules
+2023-06-21 16:05:04,583 [+] WARNING - Yara Results: 
+2023-06-21 16:05:04,583 [+] WARNING - b'invalid_trailer_structure C:\\Users\\husky\\Downloads\\monochromepdf.pdf\r\n'

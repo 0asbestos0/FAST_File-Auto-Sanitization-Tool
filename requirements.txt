@@ -1,3 +1,4 @@
+logging
 comtypes
 hashlib
 zlib

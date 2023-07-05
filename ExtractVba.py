@@ -103,6 +103,7 @@
 #	
 #	
 import math
+import maintool
 def P23Ord(value):
     if type(value) == int:
         return value
@@ -181,19 +182,27 @@ def find_pattern_offsets(data, pattern):
     return offsets
 
 
-def find_and_decompress(filename,data):
+def find_and_decompress(filename,data,args):
     pattern=b'\x00Attribut\x00e '
     offsets= find_pattern_offsets(data, pattern)
     print('offsets:')
-    print(offsets)
-    if -1 not in offsets:
-        c=input("Macros found, should i print the decompressed Macros? 1/0")
-        if c=='1':
-            for offset in offsets:
-                DecompressedChunk=DecompressChunk(data[offset-2:])
-                print(DecompressedChunk[0])
+    print(offsets)    
+    
+    if len(offsets)>0:
+        if args.manual:
+            c=input("Macros found, should i print all the decompressed Macros? 1/0")
+
+            if c=='1':
+                if args.report:
+                    maintool.log('info',args,'User opted to print Macros on the terminal')
                 print('/////////////////////////////////////////////////////')
                 print('/////////////////////////////////////////////////////')
+                for offset in offsets:
+                    DecompressedChunk=DecompressChunk(data[offset-2:])
+                    print(DecompressedChunk[0])
+                    print('/////////////////////////////////////////////////////')
+                    print('/////////////////////////////////////////////////////')
 
         return(0)
-    return(1)
+    else:
+        return(1)

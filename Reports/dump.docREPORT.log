@@ -1,0 +1,98 @@
+[+] INFO - File to be scanned: C:\Users\husky\Downloads\dump.doc
+[+] INFO - Magic Bytes of file: d0cf11e0
+[+] INFO - Macros Found, disarming the file
+2023-06-21 15:24:19,621 [+] INFO - File to be scanned: C:\Users\husky\Downloads\dump.doc
+2023-06-21 15:24:19,621 [+] INFO - Magic Bytes of file: d0cf11e0
+2023-06-21 15:24:20,089 [+] INFO - Macros Found, disarming the file
+2023-07-02 15:40:44,648 [+] INFO - File to be scanned: C:\Users\husky\Downloads\dump.doc
+2023-07-02 15:40:44,697 [+] INFO - Magic Bytes of file: d0cf11e0
+2023-07-02 15:40:44,697 [+] INFO - Running Yara rules
+2023-07-02 15:40:45,355 [+] WARNING - Yara Results: 
+2023-07-02 15:40:45,374 [+] WARNING - 
+2023-07-02 15:40:45,422 [+] WARNING - Yara Results: 
+2023-07-02 15:40:45,422 [+] WARNING - 
+2023-07-02 15:40:45,494 [+] WARNING - Yara Results: 
+2023-07-02 15:40:45,494 [+] WARNING - 
+2023-07-02 15:40:45,520 [+] WARNING - Yara Results: 
+2023-07-02 15:40:45,558 [+] WARNING - 
+2023-07-02 15:40:45,606 [+] WARNING - Yara Results: 
+2023-07-02 15:40:45,606 [+] WARNING - 
+2023-07-02 15:40:45,681 [+] WARNING - Yara Results: 
+2023-07-02 15:40:45,681 [+] WARNING - 
+2023-07-02 15:40:45,756 [+] WARNING - Yara Results: 
+2023-07-02 15:40:45,756 [+] WARNING - 
+2023-07-02 15:40:45,822 [+] WARNING - Yara Results: 
+2023-07-02 15:40:45,822 [+] WARNING - 
+2023-07-02 15:40:45,891 [+] WARNING - Yara Results: 
+2023-07-02 15:40:45,891 [+] WARNING - 
+2023-07-02 15:40:45,963 [+] WARNING - Yara Results: 
+2023-07-02 15:40:45,963 [+] WARNING - 
+2023-07-02 15:40:46,032 [+] WARNING - Yara Results: 
+2023-07-02 15:40:46,032 [+] WARNING - 
+2023-07-02 15:40:46,078 [+] WARNING - Yara Results: 
+2023-07-02 15:40:46,103 [+] WARNING - 
+2023-07-02 15:40:46,152 [+] WARNING - Yara Results: 
+2023-07-02 15:40:46,152 [+] WARNING - 
+2023-07-02 15:40:46,224 [+] WARNING - Yara Results: 
+2023-07-02 15:40:46,224 [+] WARNING - 
+2023-07-02 15:40:46,289 [+] WARNING - Yara Results: 
+2023-07-02 15:40:46,289 [+] WARNING - 
+2023-07-02 15:40:46,333 [+] WARNING - Yara Results: 
+2023-07-02 15:40:46,333 [+] WARNING - Contains_VBA_macro_code C:\Users\husky\Downloads\dump.doc
+2023-07-02 15:40:46,333 [+] WARNING - 
+2023-07-02 15:40:46,425 [+] WARNING - Yara Results: 
+2023-07-02 15:40:46,427 [+] WARNING - 
+2023-07-02 15:40:46,475 [+] WARNING - Yara Results: 
+2023-07-02 15:40:46,475 [+] WARNING - 
+2023-07-02 15:40:46,545 [+] WARNING - Yara Results: 
+2023-07-02 15:40:46,545 [+] WARNING - 
+2023-07-02 15:40:46,620 [+] WARNING - Yara Results: 
+2023-07-02 15:40:46,620 [+] WARNING - office_document_vba C:\Users\husky\Downloads\dump.doc
+2023-07-02 15:40:46,620 [+] WARNING - Office_AutoOpen_Macro C:\Users\husky\Downloads\dump.doc
+2023-07-02 15:40:46,620 [+] WARNING - 
+2023-07-02 15:44:49,539 [+] INFO - File to be scanned: C:\Users\husky\Downloads\dump.doc
+2023-07-02 15:44:49,539 [+] INFO - Magic Bytes of file: d0cf11e0
+2023-07-02 15:44:49,539 [+] INFO - Running Yara rules
+2023-07-02 15:44:49,761 [+] WARNING - Yara Results: 
+2023-07-02 15:44:49,761 [+] WARNING - 
+2023-07-02 15:44:49,799 [+] WARNING - Yara Results: 
+2023-07-02 15:44:49,799 [+] WARNING - 
+2023-07-02 15:44:49,839 [+] WARNING - Yara Results: 
+2023-07-02 15:44:49,848 [+] WARNING - 
+2023-07-02 15:44:49,883 [+] WARNING - Yara Results: 
+2023-07-02 15:44:49,883 [+] WARNING - 
+2023-07-02 15:44:49,935 [+] WARNING - Yara Results: 
+2023-07-02 15:44:49,935 [+] WARNING - 
+2023-07-02 15:44:49,986 [+] WARNING - Yara Results: 
+2023-07-02 15:44:49,986 [+] WARNING - 
+2023-07-02 15:44:50,038 [+] WARNING - Yara Results: 
+2023-07-02 15:44:50,038 [+] WARNING - 
+2023-07-02 15:44:50,091 [+] WARNING - Yara Results: 
+2023-07-02 15:44:50,091 [+] WARNING - 
+2023-07-02 15:44:50,124 [+] WARNING - Yara Results: 
+2023-07-02 15:44:50,143 [+] WARNING - 
+2023-07-02 15:44:50,192 [+] WARNING - Yara Results: 
+2023-07-02 15:44:50,192 [+] WARNING - 
+2023-07-02 15:44:50,227 [+] WARNING - Yara Results: 
+2023-07-02 15:44:50,227 [+] WARNING - 
+2023-07-02 15:44:50,278 [+] WARNING - Yara Results: 
+2023-07-02 15:44:50,278 [+] WARNING - 
+2023-07-02 15:44:50,314 [+] WARNING - Yara Results: 
+2023-07-02 15:44:50,314 [+] WARNING - 
+2023-07-02 15:44:50,360 [+] WARNING - Yara Results: 
+2023-07-02 15:44:50,360 [+] WARNING - 
+2023-07-02 15:44:50,411 [+] WARNING - Yara Results: 
+2023-07-02 15:44:50,411 [+] WARNING - 
+2023-07-02 15:44:50,464 [+] WARNING - Yara Results: 
+2023-07-02 15:44:50,464 [+] WARNING - Contains_VBA_macro_code C:\Users\husky\Downloads\dump.doc
+2023-07-02 15:44:50,464 [+] WARNING - 
+2023-07-02 15:44:50,516 [+] WARNING - Yara Results: 
+2023-07-02 15:44:50,516 [+] WARNING - 
+2023-07-02 15:44:50,569 [+] WARNING - Yara Results: 
+2023-07-02 15:44:50,569 [+] WARNING - 
+2023-07-02 15:44:50,620 [+] WARNING - Yara Results: 
+2023-07-02 15:44:50,620 [+] WARNING - 
+2023-07-02 15:44:50,672 [+] WARNING - Yara Results: 
+2023-07-02 15:44:50,672 [+] WARNING - office_document_vba C:\Users\husky\Downloads\dump.doc
+2023-07-02 15:44:50,672 [+] WARNING - Office_AutoOpen_Macro C:\Users\husky\Downloads\dump.doc
+2023-07-02 15:44:50,672 [+] WARNING - 

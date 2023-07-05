@@ -1,7 +1,7 @@
 import hashlib
 import vt
 import time
-
+import maintool
 
 def GetHash(filename):
 	sha256_hash = hashlib.sha256()
@@ -38,28 +38,50 @@ def scan(filename,args):
 			if result!=None:
 				positives=positives+1
 
-		print(str(positives)+'/'+str(len(results))+' engines flagged it as MALICIOUS')
+		flagged=str(positives)+'/'+str(len(results))
+		print(flagged+' engines flagged it as MALICIOUS')
+		maintool.log('warning',args,'User didnot opt for file rescan with Virus Total')
+		
 		client.close()
 
 	api_key = input('Enter your API key: ')
+	
+	maintool.log('info',args,'User selected the Virus Total Flag')
+	maintool.log('info',args,'User Provided API key: '+api_key)
+
+	
+	#Add try catch in case the API key was wrong
+
 	client = vt.Client(api_key)
 	sha256hash= GetHash(filename)
+	
 	print('SHA-256 hash of file: '+str(sha256hash))
+	maintool.log('info',args,'SHA256 hash of file: '+sha256hash)
 
 	file_report = client.get_object("/files/{}".format(sha256hash))
 	print('Last analyzed VT Report: ')
 	print(file_report.last_analysis_stats)
+
+	maintool.log('info',args,'File was last analyzed on '+file_report.last_analysis_date+' and the report is: ' +file_report.last_analysis_stats)
 	
 	if file_report is None:
+		
 		print("File not found in VirusTotal.")
+		maintool.log('info',args,'File was not found in Virus Total')
+
 		if args.manual:
 			c=input('Would you like to scan the file in VirusTotal again? *T&C apply. 1/0: ')
 			if c!='1':
+			
+				maintool.log('info',args,'User did not opt for file rescan with Virus Total')
 				return
+			
+			maintool.log('info',args,'User opted for file rescan with Virus Total')
 			rescan(filename,args)		
 		return
 	else:
 		print(file_report)
+		maintool.log('info',args,'Virus Total File report: ')
 		#print("File Name: {}".format(file_report.attributes['names'][0]))
 #		print("File Type: {}".format(file_report.attributes['type_description']))
 #		print("File Size: {} bytes".format(file_report.attributes['size']))

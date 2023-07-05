@@ -1,12 +1,21 @@
 import os
 import subprocess
 import re
+import maintool
 
-def pdfanalyze(path):
+def pdfanalyze(path,args):
 	command= 'yara64 -w ' + os.environ.get('current_directory') +'\\rulescp\\maldocs\\Maldoc_PDF.yar '+ '\"' + path + '\"' #change rulescp to rules
 	#print(command)
 	print("Running yara rules: \n")
-	print(os.system(command))
+	maintool.log('info',args,'Running Yara Rules')
+	output= subprocess.check_output(command, shell=True)
+	
+	if output!=None:
+		output=output.decode().split('\r\n')
+		maintool.log('warning',args,'Yara Results: ')
+		for o in output:
+			maintool.log('warning',args, o)
+			print(o)
 	print("\n")
 
 	command='pdfid '+ path
@@ -56,9 +65,10 @@ def parsepdfobjs(path,args):
 
 	pdfobjectsraw=re.findall(pattern, pdfbytesdata, re.DOTALL) # array that  stores the individial indirecto bjects in byted form
 	if args.manual:
-		choice=input("Would you like to print each object to the terminal? 1/0: ")
+		choice=input("Would you like to print each PDF object to the terminal? 1/0: ")
 	
 		if choice=='1':
+			maintool.log('info',args,'User Opted to print out each object to terminal')
 			for pdfobject in pdfobjectsraw:
 				print(pdfobject.replace(b'\r\n',b''))
 		
@@ -102,7 +112,7 @@ def susobjects(pdfobjects):
 
 def extract(path,objreference):
 	command='pdf-parser -f -o '+str(objreference)+' -d \"'+ path[:-4] +'(extracted obj '+str(objreference)+').bin\" '+path
-	print('Command: '+command)
+	#print('Command: '+command)
 	output = subprocess.check_output(command, shell=True)
 	print(output)
 

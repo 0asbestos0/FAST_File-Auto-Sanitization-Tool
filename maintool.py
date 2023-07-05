@@ -5,24 +5,46 @@ import docanalysis
 import doc_self_mine
 import VT
 import tmp
-import argparse
+import img
 
+import argparse
+import logging
 import binascii
 import os
 import subprocess
 import sys
 
+def log(flag,args,message):
+	if args.report:
+		if flag == 'debug':	
+			logging.debug(message)
+		if flag == 'info':
+			logging.info(message)
+		if flag == 'warning':
+			logging.warning(message)
+		if flag == 'error':
+			logging.error(message)
+		if flag == 'critical':
+			logging.critical(message)
+	
 def main(filename,args):
 	
 	os.environ['current_directory']=os.path.dirname(os.path.abspath( __file__ ))
-	
-	
 	path_to_file=filename
-	
+
+	if args.report:
+		logging.basicConfig(filename= os.environ.get('current_directory')+'\\Reports\\'+path_to_file.split("\\")[-1]+'REPORT.log', level=logging.INFO,format='%(asctime)s [+] %(levelname)s - %(message)s')
+
+	#log('info',args,'Arguments provided for scan: '+args)
+
 	print("Path: "+path_to_file)
+	log('info',args,'File to be scanned: '+path_to_file)
+
 	mb=extension.actualextension(path_to_file)
 	
 	print("mb: "+str(mb))
+	log('info',args,'Magic Bytes of file: '+str(mb))
+
 	magic_bytes = {
 	    "25504446": "PDF",
 	    "d0cf11e0":"DOC",
@@ -39,10 +61,11 @@ def main(filename,args):
 	
 	if mb in magic_bytes.keys():
 		actualfiletype=magic_bytes[mb]
-		print("actual filetype: "+actualfiletype)
+		print("Actual filetype inferred from Magic Bytes: "+actualfiletype)
 	
 	else:
 		print("Cannot process this filetype yet")
+		log('info',args,'Cannot process this filetype yet')
 		exit()
 
 	
@@ -50,7 +73,7 @@ def main(filename,args):
 		VT.scan(path_to_file,args)
 
 	if actualfiletype == "PDF":
-		pdfanalysis.pdfanalyze(path_to_file)						#Only runs YARA rules
+		pdfanalysis.pdfanalyze(path_to_file,args)						#Only runs YARA rules
 		#pdfanalysis.parsepdfobjs(path_to_file)
 		pdfobjects = pdfanalysis.parsepdfobjs(path_to_file,args)
 		
@@ -58,10 +81,13 @@ def main(filename,args):
 		if args.manual:
 			print('The following PDF objects number are suspicious. Check each object individually and extract if needed')
 			print(suspdfobjects)
+			log('warning',args,'Follwing PDF objects are suspecious: ' +  ' '.join(suspdfobjects))
+
 			while True:
 				choice=input('Enter which object number to extract (0 to exit): ')
 				if choice=='0':
 					break
+				maintool.log('info',args,'User extracted object number: '+str(choices))
 				pdfanalysis.extract(path_to_file,int(choice))
 		else:
 			for suspdfobject in suspdfobjects:
@@ -70,6 +96,7 @@ def main(filename,args):
 
 	
 		print('Disabling JS and Auto Launch if any and outputting cleaned file: ')
+		log('info',args,'Disabling JS and Auto Launch if any and outputting cleaned file: ')
 		pdfanalysis.disable(path_to_file)
 		#add a method for extracting the embedded file
 		#add method to find any hyperlinks in pdf
@@ -79,7 +106,11 @@ def main(filename,args):
 		tmp.docyara(path_to_file,args)			#Only runs YARA rules
 		tmp.func(path_to_file,args)				#For manual (Self) parsing
 		print("Checking if file contains Macros, extracting if found and disarming the file:")
+		log('info',args,'Checking if file contains Macros, extracting if found and disarming the file')
 		tmp.disarm(path_to_file,args)			#Prints Decompressed Macros and disarms the file
+
+	elif(actualfiletype == 'JPEG' or actualfiletype == 'PNG'):
+		img.imganalyze(path_to_file,args,actualfiletype)
 
 
 
@@ -110,6 +141,7 @@ if __name__ == '__main__':
 	parser.add_argument("-m", "--manual", action="store_true", help="Manual mode (Promts user, Use only if you have knowledge about file formats)")
 	parser.add_argument("-vt", "-virustotal", action="store_true", help="If there is internet, it also uses VirusTotal. *T&C Apply. Not compatible with directory flag")
 	parser.add_argument("--guide", action="store_true", help="Explains how to use the tool")
+	parser.add_argument("-r", "--report", action="store_true", help="Generte a report")
 	args = parser.parse_args()
 
 	if args.guide:

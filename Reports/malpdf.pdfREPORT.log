@@ -1,0 +1,10 @@
+2023-06-21 16:26:54,162 [+] INFO - File to be scanned: C:\Users\husky\Downloads\malpdf.pdf
+2023-06-21 16:26:54,162 [+] INFO - Magic Bytes of file: 25504446
+2023-06-21 16:26:54,191 [+] INFO - Running Yara Rules
+2023-06-21 16:26:54,248 [+] WARNING - Yara Results: 
+2023-06-21 16:26:54,248 [+] WARNING - suspicious_launch_action C:\Users\husky\Downloads\malpdf.pdf
+2023-06-21 16:26:54,248 [+] WARNING - invalid_trailer_structure C:\Users\husky\Downloads\malpdf.pdf
+2023-06-21 16:26:54,248 [+] WARNING - js_wrong_version C:\Users\husky\Downloads\malpdf.pdf
+2023-06-21 16:26:54,248 [+] WARNING - FlateDecode_wrong_version C:\Users\husky\Downloads\malpdf.pdf
+2023-06-21 16:26:54,248 [+] WARNING - embed_wrong_version C:\Users\husky\Downloads\malpdf.pdf
+2023-06-21 16:26:54,248 [+] WARNING - 

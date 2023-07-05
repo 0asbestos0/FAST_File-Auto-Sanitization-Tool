@@ -308,11 +308,14 @@ import win32com.client as win32
 import ExtractVba
 import os
 import subprocess
+import maintool
 
 def docyara(path,args):
 	#command= 'yara64 -w ' + os.environ.get('current_directory') +'\\rulescp\\maldocs\\Maldoc_PDF.yar '+path #change rulescp to rules
 	#print(command)
 	print("Running yara rules: \n")
+	maintool.log('info',args,'Running Yara rules')
+
 	command = 'ls '+ os.environ.get('current_directory') +'\\rulescp\\maldocs'
 	rules = subprocess.check_output(command, shell=True).decode().split('\r\n')
 	
@@ -322,9 +325,21 @@ def docyara(path,args):
 	
 	for rule in rules:
 		command='yara64 -w ' + os.environ.get('current_directory') +'\\rulescp\\maldocs\\'+rule+' '+path #change rulescp to rules
-		if args.manual:
-			if (os.system(command)!=0):
-				print(os.system(command))
+		output=subprocess.check_output(command, shell=True)
+		if (output!=b''):
+			if args.report:
+				maintool.log('warning',args,'Yara Results: ') #error: use only when logging required
+			
+			#print(output)
+			output=output.decode().split('\r\n')
+			#print('//////////////////')
+			#print(output)
+			for o in output:
+				#print(output)
+				if o!=b'':
+					print(o)
+					if args.report:
+						maintool.log('warning',args,o)
 
 def func(filename,args):
 	if args.manual==False:
@@ -355,6 +370,7 @@ def func(filename,args):
 	#		FatSectors.append(i)
 	print('FAT Sectors:')
 	print(sectFat)
+	
 
 	FatChain=[]
 	for sectornumber in sectFat:
@@ -363,18 +379,23 @@ def func(filename,args):
 			FatChain.append(struct.unpack('<i',sectordata[j:j+4])[0])
 	print('FatChain: ')
 	print(FatChain)
+	
 
 	DirChain=traverseFat(FatChain,sectDirStart)
 	#print('Directory chain: ')
 	#print(DirChain)
 	miniFatSectors=traverseFat(FatChain,sectMiniFatStart)
+	
 	print('MiniFat Sectors:')
 	print(miniFatSectors)
+	
 
 	directory=parsedirectory(DirChain,data)
 	print('Directory: ')
+	maintool.log('info',args,'Directory: ')
 	for d in directory:
 		print(d)
+		maintool.log('info',args,d)
 
 	secMiniStreamStart=directory[0].SectStart
 	print('Starting sector of MiniStream:')
@@ -422,15 +443,22 @@ def disarm(filename,args):
 	if vbaFlag==0: #Means Macros are found
 		if not args.manual:
 			print('Macros Found, disarming the file')
+			maintool.log('warning',args,'Macros Found, disarming the file')
 			command=os.environ.get('current_directory')+'\\VBASanitizer.exe '+'\"' +filename+ '\"'+' '+filename[:-4]+'(RemovedMacros)'+filename[-4:]
 			#print(command)
-			os.system(command)
+			output=subprocess.check_output(command, shell=True)
+			print(output)
+			maintool.log('info',args,output)
+
 			return 0
 		c=input('Found Macros disarm the file? 1/0: ')
 		if args.manual and c=='1':
+			maintool.log('info',args,'User opted to Remove Macros from the file')
 			command=os.environ.get('current_directory')+'\\VBASanitizer.exe '+'\"' +filename+ '\"'+' '+filename[:-4]+'(RemovedMacros)'+filename[-4:]
 			#print(command)
-			os.system(command)
+			output=subprocess.check_output(command, shell=True)
+			print(output)
+			maintool.log('info',args,output)
 
 
 class Directory:
