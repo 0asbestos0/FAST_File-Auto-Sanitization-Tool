@@ -87,20 +87,26 @@ def main(filename,args):
 				choice=input('Enter which object number to extract (0 to exit): ')
 				if choice=='0':
 					break
-				maintool.log('info',args,'User extracted object number: '+str(choices))
-				pdfanalysis.extract(path_to_file,int(choice))
+				log('info',args,'User extracted object number: '+str(choice))
+				pdfanalysis.extract2(path_to_file,pdfobjects, int(choice),args)
+
+			choice=input('Disabling JS and Auto Launch if any?1/0: ')
+			if choice=='1':
+				print('Disabling JS and Auto Launch if any and outputting cleaned file: ')
+				if args.report:
+					log('info',args,'Disabling JS and Auto Launch if any and outputting cleaned file: ')
+				pdfanalysis.disable(path_to_file)
 		else:
 			for suspdfobject in suspdfobjects:
 				#pdfanalysis.extract(path_to_file,int(suspdfobject))
 				pdfanalysis.extract2(path_to_file, pdfobjects, int(suspdfobject), args)
 
 	
-		print('Disabling JS and Auto Launch if any and outputting cleaned file: ')
-		log('info',args,'Disabling JS and Auto Launch if any and outputting cleaned file: ')
-		pdfanalysis.disable(path_to_file)
+			print('Disabling JS and Auto Launch if any and outputting cleaned file: ')
+			log('info',args,'Disabling JS and Auto Launch if any and outputting cleaned file: ')
+			pdfanalysis.disable(path_to_file)
 		#add a method for extracting the embedded file
 		#add method to find any hyperlinks in pdf
-		#add method to find macros in pdf
 	
 	elif(actualfiletype == 'DOC'):
 		tmp.docyara(path_to_file,args)			#Only runs YARA rules

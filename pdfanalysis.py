@@ -3,6 +3,19 @@ import subprocess
 import re
 import maintool
 
+def occurances(data, pattern):
+	count=0
+	offset=0
+	while True:
+		index = data.find(pattern, offset)
+		if index == -1:
+			break
+		count += 1
+		offset = index + len(pattern)
+
+	return count
+
+
 def pdfanalyze(path,args):
 	command= 'yara64 -w ' + os.environ.get('current_directory') +'\\rulescp\\maldocs\\Maldoc_PDF.yar '+ '\"' + path + '\"' #change rulescp to rules
 	#print(command)
@@ -18,10 +31,13 @@ def pdfanalyze(path,args):
 			print(o)
 	print("\n")
 
+'''	#I am trying to remove the dependency on PDFID 
+	#This was the code earlier:
+
 	command='pdfid '+ path
 	output = subprocess.check_output(command, shell=True)
 	output=output.decode('utf-8').replace(' ','').split("\r\n")
-	
+
 	for element in output:
 		if '/Encrypt' in element:
 			if element[-1] !=0:
@@ -44,7 +60,7 @@ def pdfanalyze(path,args):
 				print("This PDF contains "+element[-1]+" instances of the OpenAction function.")
 			else:
 				print("This PDF does not contain the OpenAction function")
-
+'''
 
 class pdfobjectdatatype:
 	def __init__(self, objreference, content):
@@ -62,6 +78,13 @@ def parsepdfobjs(path,args):
 
 	with open(path,'rb') as f:
 		pdfbytesdata=f.read()
+
+	flaglist=[b'/EmbeddedFile',b'/JavaScript',b'/Encrypt',b'/OpenAction']
+	for flag in flaglist:
+		count=occurances(pdfbytesdata,flag)
+		if count!=0:
+			print(f'This PDF contains {count} occurances of {flag}.')
+
 
 	pdfobjectsraw=re.findall(pattern, pdfbytesdata, re.DOTALL) # array that  stores the individial indirecto bjects in byted form
 	if args.manual:
@@ -110,15 +133,17 @@ def susobjects(pdfobjects):
 
 	return(suspdfobjects)
 
-def extract(path,objreference):
+'''def extract(path,objreference):
+	#I am trying to remove dependency on pdf-parser.
+	#This was original code
+
 	command='pdf-parser -f -o '+str(objreference)+' -d \"'+ path[:-4] +'(extracted obj '+str(objreference)+').bin\" '+path
 	#print('Command: '+command)
 	output = subprocess.check_output(command, shell=True)
 	print(output)
-
-
+'''
 def extract2(path, pdfobjects, objreference, args):
-	if args.manual:						#If manual mode is enabled, extract the object in a binary file
+	'''if args.manual:						#If manual mode is enabled, extract the object in a binary file
 		dfilename=path[:-4]+'(ExtractedObj_'+str(objreference)+').bin'
 
 		obj=pdfobjects[objreference-1].split(b'\x0D\x0A')
@@ -131,10 +156,16 @@ def extract2(path, pdfobjects, objreference, args):
 			print(objfilter)
 
 		#swith open(dfilename,'wb') as f:
+	'''
+	dfilename=os.environ.get('current_directory')+'\\Quarantine\\'+'(ExtractedObj_'+str(objreference)+').bin'
+	obj=pdfobjects[objreference-1]
+	with open(dfilename,'wb') as f:
+		f.write(obj.content)
+	#print(obj.content)
 
 
 
 def disable(path):
 	command='pdfid -d \"'+path+'\"'
-	print('Command: '+command)
+	#print('Command: '+command)
 	output = subprocess.check_output(command, shell=True)

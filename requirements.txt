@@ -1,12 +1,6 @@
 logging
-comtypes
-hashlib
-zlib
 vt-py
 bitstring
-ortools
-oletools
-python-docx
 pdfid
-pywin32
+Pillow
 argparse
