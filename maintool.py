@@ -81,7 +81,8 @@ def main(filename,args):
 		if args.manual:
 			print('The following PDF objects number are suspicious. Check each object individually and extract if needed')
 			print(suspdfobjects)
-			log('warning',args,'Follwing PDF objects are suspecious: ' +  ' '.join(suspdfobjects))
+			if args.report:
+				log('warning',args,'Follwing PDF objects are suspecious: ' +  ' '.join(suspdfobjects))
 
 			while True:
 				choice=input('Enter which object number to extract (0 to exit): ')
@@ -90,12 +91,13 @@ def main(filename,args):
 				log('info',args,'User extracted object number: '+str(choice))
 				pdfanalysis.extract2(path_to_file,pdfobjects, int(choice),args)
 
-			choice=input('Disabling JS and Auto Launch if any?1/0: ')
+			choice=input('Remove suspecious objects?1/0: ')
 			if choice=='1':
-				print('Disabling JS and Auto Launch if any and outputting cleaned file: ')
+				print('Removing suspecious objects ')
 				if args.report:
-					log('info',args,'Disabling JS and Auto Launch if any and outputting cleaned file: ')
-				pdfanalysis.disable(path_to_file)
+					log('info',args,'Removing suspecious objects ')
+				#pdfanalysis.disable(path_to_file)		#This is done in order to reduce dependency on PDFiD tool
+				pdfanalysis.deleteObj(suspdfobjects,path_to_file)
 		else:
 			for suspdfobject in suspdfobjects:
 				#pdfanalysis.extract(path_to_file,int(suspdfobject))
@@ -104,7 +106,9 @@ def main(filename,args):
 	
 			print('Disabling JS and Auto Launch if any and outputting cleaned file: ')
 			log('info',args,'Disabling JS and Auto Launch if any and outputting cleaned file: ')
-			pdfanalysis.disable(path_to_file)
+			#pdfanalysis.disable(path_to_file)
+			pdfanalysis.deleteObj(suspdfobjects,path_to_file)
+			
 		#add a method for extracting the embedded file
 		#add method to find any hyperlinks in pdf
 	

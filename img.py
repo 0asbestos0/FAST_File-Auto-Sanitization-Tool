@@ -8,7 +8,7 @@ def imganalyze(path,args,actualfiletype):
 	#	print('doing yara')
 	fname,ext=os.path.splitext(path)
 		
-	output_file=fname.rstrip('.')+'(cleaned).'+ext
+	output_file=fname.rstrip('.')+'(cleaned)'+ext
 	if args.report:
 		maintool.log('info',args,'Sanitizing the image file by removing irrelevant information')
 		maintool.log('info',args,'New file saved in destination: '+output_file)

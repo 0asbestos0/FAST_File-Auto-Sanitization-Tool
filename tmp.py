@@ -303,8 +303,6 @@ for d in dirs:
 print(dirs2)'''
 
 import struct
-from docx import Document
-import win32com.client as win32
 import ExtractVba
 import os
 import subprocess
@@ -316,7 +314,7 @@ def docyara(path,args):
 	print("Running yara rules: \n")
 	maintool.log('info',args,'Running Yara rules')
 
-	command = 'ls '+ os.environ.get('current_directory') +'\\rulescp\\maldocs'
+	command = 'dir /B '+ os.environ.get('current_directory') +'\\rulescp\\maldocs'
 	rules = subprocess.check_output(command, shell=True).decode().split('\r\n')
 	
 	while ('' in rules): # just some filtering

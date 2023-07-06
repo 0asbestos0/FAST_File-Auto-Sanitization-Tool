@@ -1,10 +1,12 @@
-def deleteObj(objs, filename):												#obj must be an integer
+def deleteObj(objs, filename):												#objs must be a list
 	with open(filename,'rb') as f:
 		o2data=f.read()
 
 	odata=o2data
 
 	for obj in objs:
+		if obj ==1:
+			continue
 		index_c_obj=find_nth_occurrence(odata,b'obj',2*obj-1)-4
 		ndata=b''
 		ndata=ndata+odata[:index_c_obj] 			#+10 to account for 6 digits of 'endobj' and 4 digits of '0D 0A 0D 0A'seperator
@@ -49,5 +51,5 @@ def flatedecode():
 	
 	print('Done')
 
-filename=input('Enter filename')
-deleteObj([9],filename)
+#filename=input('Enter filename')
+#deleteObj([9],filename)
