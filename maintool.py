@@ -6,6 +6,7 @@ import doc_self_mine
 import VT
 import tmp
 import img
+import czip
 
 import argparse
 import logging
@@ -122,6 +123,15 @@ def main(filename,args):
 	elif(actualfiletype == 'JPEG' or actualfiletype == 'PNG'):
 		img.imganalyze(path_to_file,args,actualfiletype)
 
+	elif(actualfiletype == 'ZIP'):
+		print('***DISCLAIMER***\nZIP/docx file sanitization is an experimental feature still in development.\nThe tool DOES NOT guarantee protection against Zip Bombs.\nZip Bombs can damage you system.\nUse this feature only if you are ABSOLUTELY SURE that the zip file is not a zip bomb. ')
+		choice=input('Do you wish to continue?1/0: ')
+		if choice !='1':
+			sys.exit()
+
+		czip.analyze(path_to_file,args)
+
+
 
 
 
@@ -132,7 +142,7 @@ def printguide():
 
 def dirmode(args):
 	#fnames=[]
-	fnames = subprocess.check_output('ls '+str(args.directory), shell=True).decode().strip('\r\n').split('\r\n')
+	fnames = subprocess.check_output('dir /B '+str(args.directory), shell=True).decode().strip('\r\n').split('\r\n')
 	for i in range(len(fnames)):
 		fnames[i]=args.directory+'\\'+fnames[i]
 
