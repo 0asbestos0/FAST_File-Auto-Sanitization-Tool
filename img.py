@@ -20,13 +20,13 @@ def imganalyze(path,args,actualfiletype):
 			return
 	with Image.open(path) as image:
        
-		#image = image.convert('RGB') # To handle PNG images
+		image = image.convert('RGB') # To handle PNG images
 		data = image.tobytes()
-		with open('C:\\Users\\husky\\Downloads\\data.bin','wb')as f:
-			f.write(data)
+		#with open('C:\\Users\\husky\\Downloads\\data.bin','wb')as f:
+		#	f.write(data)
 		
-		print(image.mode)
-		print(image.size)
+		#print(image.mode)
+		#print(image.size)
 
 		extracted_image = Image.frombytes(image.mode, image.size, data)
 
